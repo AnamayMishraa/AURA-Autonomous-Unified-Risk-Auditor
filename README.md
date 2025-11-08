@@ -1,3 +1,5 @@
+⚠️ Note: AURA provides AI-assisted compliance insights and does not replace certified audits or professional GRC evaluations.
+
 # 🧠 AURA – Autonomous Unified Risk Auditor
 
 ### 🔒 AI-Powered Compliance Control Monitoring and Risk Analysis System
