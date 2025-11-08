@@ -1,0 +1,395 @@
+{
+  "name": "AI-GRC-Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 11
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2d5e2092-0a0d-4b74-97fb-b986d523e974",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1SAr0sYtf6OxsvqmgdICQEW4pOfwatQU2cgZ61HgmGk4",
+          "mode": "list",
+          "cachedResultName": "Compliance",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SAr0sYtf6OxsvqmgdICQEW4pOfwatQU2cgZ61HgmGk4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2035266767,
+          "mode": "list",
+          "cachedResultName": "DATED-06/11/2025",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SAr0sYtf6OxsvqmgdICQEW4pOfwatQU2cgZ61HgmGk4/edit#gid=2035266767"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "6db514bb-d6d0-47ac-aa59-ac451339f2b6",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DvAdGrZZIRQn0ky8",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "609af2b2-45b7-420a-bff0-6fb2b20892f5",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "Not Implemented",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "9ac56347-242c-4005-86c1-5989fae2796d",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "Partially Implemented",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "b3c0514d-a00b-43f1-86dd-62f02c9d5581",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an ISO 27001 compliance assistant.\n\nYour job: Review the following control information and output the Control ID, AI Risk Level, and AI Suggested Action.\n\nControl ID: {{ $json[\"Control ID\"] }}\nControl Name: {{ $json[\"Control Name\"] }}\nDetails: {{ $json.Details }}\nEvidence / Notes: {{ $json[\"Evidence / Notes\"] }}\n\nImportant:\n- Always include the Control ID exactly as shown.\n- Output only in **this exact format** (no extra words or markdown):\n\nControl ID: <Control ID>\nAI Risk Level: <High|Medium|Low>\nAI Suggested Action: <short actionable recommendation>\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        736,
+        0
+      ],
+      "id": "b4b382c9-5e02-4ecf-adbc-f35b29a44054",
+      "name": "AI Agent",
+      "alwaysOutputData": false,
+      "notesInFlow": false,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        608,
+        208
+      ],
+      "id": "c6dfdd35-2292-44f7-ad96-e3c85a196569",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "ICebc9lyG7rykpiv",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1SAr0sYtf6OxsvqmgdICQEW4pOfwatQU2cgZ61HgmGk4",
+          "mode": "list",
+          "cachedResultName": "Compliance",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SAr0sYtf6OxsvqmgdICQEW4pOfwatQU2cgZ61HgmGk4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2035266767,
+          "mode": "list",
+          "cachedResultName": "DATED-06/11/2025",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SAr0sYtf6OxsvqmgdICQEW4pOfwatQU2cgZ61HgmGk4/edit#gid=2035266767"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Control ID": "={{ $json[\"Control ID\"] }}",
+            "AI Risk Level": "={{ $json[\"AI Risk Level\"] }}",
+            "AI Suggested Action": "={{ $json[\"AI Suggested Action\"] }}"
+          },
+          "matchingColumns": [
+            "Control ID"
+          ],
+          "schema": [
+            {
+              "id": "Control ID",
+              "displayName": "Control ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Control Name",
+              "displayName": "Control Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Details",
+              "displayName": "Details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Evidence / Notes",
+              "displayName": "Evidence / Notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Owner",
+              "displayName": "Owner",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Last Checked",
+              "displayName": "Last Checked",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Framework",
+              "displayName": "Framework",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "AI Risk Level",
+              "displayName": "AI Risk Level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "AI Suggested Action",
+              "displayName": "AI Suggested Action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1344,
+        224
+      ],
+      "id": "7bc1a14c-0a5a-49eb-9329-ba3a1040b3e8",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DvAdGrZZIRQn0ky8",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => {\n  const output = item.json.output || \"\";\n\n  const idMatch = output.match(/Control ID:\\s*([\\w.\\-]+)/i);\n  const riskMatch = output.match(/AI Risk Level:\\s*(\\w+)/i);\n  const actionMatch = output.match(/AI Suggested Action:\\s*(.+)/i);\n\n  const controlId = idMatch ? idMatch[1].trim() : \"\";\n  const risk = riskMatch ? riskMatch[1].trim() : \"\";\n  const action = actionMatch ? actionMatch[1].trim() : \"\";\n\n  return {\n    json: {\n      \"Control ID\": controlId,\n      \"AI Risk Level\": risk,\n      \"AI Suggested Action\": action\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        48
+      ],
+      "id": "a786827a-3829-4254-a09d-bc7dffd41871",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "efc73e20-20fa-4a7d-b8c7-dad27756d330",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f3bbbd1b5c949971bab0521e58880fee6a3c2920cdedc6ed38f3479bd60f43ef"
+  },
+  "id": "vQykmRJwfBFQjeWR",
+  "tags": []
+}
